@@ -97,6 +97,20 @@ def get_gene_iri(gene_id: str) -> URIRef:
 
 def get_intergenic_region_iri(intergenic_region_name: str) -> URIRef:
     return URIRef(INTERGENIC_REGION_NS + replace_special_chars_for_iri(intergenic_region_name))
+    
+#New:
+def get_beta_strand_iri(feature_id: str) -> URIRef:
+    return URIRef(BETA_STRAND_NS + replace_special_chars_for_iri(feature_id))
+
+def get_helix_iri(feature_id: str) -> URIRef:
+    return URIRef(HELIX_NS + replace_special_chars_for_iri(feature_id))
+
+def get_coiled_coil_region_iri(feature_id: str) -> URIRef:
+    return URIRef(COILED_COIL_NS + replace_special_chars_for_iri(feature_id))
+
+def get_binding_site_iri(feature_id: str) -> URIRef:
+    return URIRef(BINDING_SITE_NS + replace_special_chars_for_iri(feature_id))
+
 
 def get_annotation_property_iri(annotation_name: str) -> URIRef:
     return URIRef(GFVO_ANN_EXT_NS + replace_special_chars_for_iri(annotation_name))
