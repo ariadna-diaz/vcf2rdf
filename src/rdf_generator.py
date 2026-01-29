@@ -43,6 +43,12 @@ FUNCTIONAL_ANNOTATION_CLASS = URIRef(GFVO_ANN_EXT_NS + 'FunctionalAnnotation')
 IMPACT_CLASS = URIRef(GFVO_ANN_EXT_NS + 'Impact')
 GFVO_FEATURE_CLASS = URIRef(GFVO_NS + 'Feature')
 INTERGENIC_REGION_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + '0000605')
+#New:
+SO_BETA_STRAND_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001111')
+SO_HELIX_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001114')
+SO_COILED_COIL_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001080')
+SO_BINDING_SITE_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0000409')
+EVIDENCE_FOR_FEATURE_PROP = URIRef(SEQUENCE_ONTOLOGY_NS + "evidence_for_feature")
 
 LENGTH_PROP = URIRef(UNIPROT_NS + 'length')
 REFERENCE_PROP = URIRef(FALDO_NS + 'reference')
@@ -145,14 +151,13 @@ def get_ann_gene_instance(annotation, graph):
         return get_gene_iri(annotation.get('Gene_Name'))
     else:
         return None
-
+        
 
 def add_intergenic_region(feature_id, graph):
     feature_instance = get_intergenic_region_iri(feature_id)
     graph.add((feature_instance, RDF.type, INTERGENIC_REGION_CLASS))
     add_label(graph, feature_instance, feature_id)
     return feature_instance
-
 
 def add_chromosome_instance(chromosome_id, graph):
     chromosome_feature_instance = get_chromosome_feature_iri_from_chromosome_name(chromosome_id)
@@ -161,35 +166,89 @@ def add_chromosome_instance(chromosome_id, graph):
     add_identifier(graph, chromosome_feature_instance, chromosome_id)
     return chromosome_feature_instance
 
+#New
+def add_beta_strand_instance(feature_id, graph):
+    beta_strand_instance = get_beta_strand_iri(feature_id)
+    graph.add((beta_strand_instance, RDF.type, SO_BETA_STRAND_CLASS))
+    add_label(graph, beta_strand_instance, feature_id)
+    # add_identifier(graph, beta_strand_instance, feature_id)
+    return beta_strand_instance
+
+def add_helix_instance(feature_id, graph):
+    helix_instance = get_helix_iri(feature_id)
+    graph.add((helix_instance, RDF.type, SO_HELIX_CLASS))
+    add_label(graph, helix_instance, feature_id)
+    add_identifier(graph, helix_instance, feature_id)
+    return helix_instance
+
+def add_coiled_coil_region_instance(feature_id: str, graph: Graph) -> URIRef:
+    coiled_coil_instance = get_coiled_coil_iri(feature_id)
+    graph.add((coiled_coil_instance, RDF.type, SO_COILED_COIL_CLASS))
+    add_label(graph, coiled_coil_instance, feature_id)
+    add_identifier(graph, coiled_coil_instance, feature_id)
+    return coiled_coil_instance
+
+def add_binding_site_instance(feature_id, graph):
+    binding_site_instance = get_binding_site_iri(feature_id)
+    graph.add((binding_site_instance, RDF.type, SO_BINDING_SITE_CLASS))
+    add_label(graph, binding_site_instance, feature_id)
+    add_identifier(graph, binding_site_instance, feature_id)
+    return binding_site_instance
+
 
 def get_ann_feature_instance(annotation, graph) -> URIRef:
     feature_instance = None
     feature_type = annotation.get('Feature_Type')
-    # print(feature_type)
     feature_id = annotation.get('Feature_ID')
 
+    if feature_type is not None and feature_type.startswith(('beta-strand', 'helix','coiled-coil-region')):
+        feature_type, evidence =  feature_type.split(":", 1)
+    else:
+        evidence = None
+    
     if feature_type == 'transcript':
         biotype = annotation.get('Transcript_BioType')
         feature_instance = add_transcript_instance(transcript_id=feature_id, biotype_name=biotype, graph=graph)
-
+    
     elif feature_type == 'intergenic_region':
         feature_instance = add_intergenic_region(feature_id=feature_id, graph=graph)
+    
     elif feature_type == 'gene':
         biotype = annotation.get('Gene_BioType')
         feature_instance = add_gene_instance(gene_id=feature_id, biotype_name=biotype, graph=graph)
+    
     elif feature_type == 'gene_variant':
         # Gene variant has a notation like MIR3675.3, where the original gene is MIR3675
         # In the genome annotations, the "." is replaced by "-", but some gene variants are not included.
         biotype = annotation.get('Gene_BioType')
         feature_instance = add_gene_instance(gene_id=feature_id.replace('.', '-'), biotype_name=biotype, graph=graph)
+    
     elif feature_type == 'chromosome':
         feature_instance = add_chromosome_instance(chromosome_id=feature_id, graph=graph)
+    
+    # New
+    elif feature_type == 'beta-strand':
+        feature_instance = add_beta_strand_instance(feature_id=feature_id, graph=graph)
+
+    elif feature_type == 'helix':
+        feature_instance = add_helix_instance(feature_id=feature_id, graph=graph)
+
+    elif feature_type == 'coiled-coil-region':
+        feature_instance = add_coiled_coil_region_instance(feature_id=feature_id, graph=graph)
+
+    elif feature_type == 'binding-site':
+        feature_instance = add_binding_site_instance(feature_id=feature_id, graph=graph)
 
     if feature_instance is not None:
         graph.add((feature_instance, RDF.type, GFVO_FEATURE_CLASS))
+        if evidence is not None: #New
+            evidence_node = BNode()
+            graph.add((evidence_node, RDF.type, INFORMATION_CONTENT_ENTITY_CLASS))
+            graph.add((evidence_node, HAS_VALUE_PROP, Literal(evidence)))
+            graph.add((evidence_node, EVIDENCE_FOR_FEATURE_PROP, feature_instance))
     else:
         print(f'Feature type "{feature_type}" not recognized. Feature ID = {feature_id}')
-
+        
     return feature_instance
 
 def add_annotation(variant: Variant, annotation: dict, graph: Graph):

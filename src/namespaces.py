@@ -19,3 +19,8 @@ FEATURE_NS = NS + "feature/"
 TRANSCRIPT_NS = FEATURE_NS + 'rna-'
 GENE_NS = FEATURE_NS + "gene-"
 INTERGENIC_REGION_NS = FEATURE_NS + "intergenic_region/"
+# New:
+HELIX_NS = FEATURE_NS + "helix/"
+COILED_COIL_NS = FEATURE_NS + "coiled_coil/"
+BINDING_SITE_NS = FEATURE_NS + "binding_site/"
+BETA_STRAND_NS = FEATURE_NS + "beta_strand/"
