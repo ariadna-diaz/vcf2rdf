@@ -48,7 +48,7 @@ SO_BETA_STRAND_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001111')
 SO_HELIX_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001114')
 SO_COILED_COIL_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001080')
 SO_BINDING_SITE_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0000409')
-
+EVIDENCE_FOR_FEATURE_PROP = URIRef(SEQUENCE_ONTOLOGY_NS + "evidence_for_feature")
 
 LENGTH_PROP = URIRef(UNIPROT_NS + 'length')
 REFERENCE_PROP = URIRef(FALDO_NS + 'reference')
@@ -198,9 +198,13 @@ def add_binding_site_instance(feature_id, graph):
 def get_ann_feature_instance(annotation, graph) -> URIRef:
     feature_instance = None
     feature_type = annotation.get('Feature_Type')
-    # print(feature_type)
     feature_id = annotation.get('Feature_ID')
 
+    if feature_type is not None and feature_type.startswith(('beta-strand', 'helix','coiled-coil-region')):
+        feature_type, evidence =  feature_type.split(":", 1)
+    else:
+        evidence = None
+    
     if feature_type == 'transcript':
         biotype = annotation.get('Transcript_BioType')
         feature_instance = add_transcript_instance(transcript_id=feature_id, biotype_name=biotype, graph=graph)
@@ -233,12 +237,17 @@ def get_ann_feature_instance(annotation, graph) -> URIRef:
 
     elif feature_type == 'binding_site':
         feature_instance = add_binding_site_instance(feature_id=feature_id, graph=graph)
-    
+
     if feature_instance is not None:
         graph.add((feature_instance, RDF.type, GFVO_FEATURE_CLASS))
+        if evidence is not None: #New
+            evidence_node = BNode()
+            graph.add((evidence_node, RDF.type, INFORMATION_CONTENT_ENTITY_CLASS))
+            graph.add((evidence_node, HAS_VALUE_PROP, Literal(evidence)))
+            graph.add((evidence_node, EVIDENCE_FOR_FEATURE_PROP, feature_instance))
     else:
         print(f'Feature type "{feature_type}" not recognized. Feature ID = {feature_id}')
-
+        
     return feature_instance
 
 def add_annotation(variant: Variant, annotation: dict, graph: Graph):
