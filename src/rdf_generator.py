@@ -166,6 +166,7 @@ def add_chromosome_instance(chromosome_id, graph):
     add_identifier(graph, chromosome_feature_instance, chromosome_id)
     return chromosome_feature_instance
 
+#New
 def add_beta_strand_instance(feature_id, graph):
     beta_strand_instance = get_beta_strand_iri(feature_id)
     graph.add((beta_strand_instance, RDF.type, SO_BETA_STRAND_CLASS))
@@ -235,7 +236,7 @@ def get_ann_feature_instance(annotation, graph) -> URIRef:
     elif feature_type == 'coiled-coil-region':
         feature_instance = add_coiled_coil_region_instance(feature_id=feature_id, graph=graph)
 
-    elif feature_type == 'binding_site':
+    elif feature_type == 'binding-site':
         feature_instance = add_binding_site_instance(feature_id=feature_id, graph=graph)
 
     if feature_instance is not None:
