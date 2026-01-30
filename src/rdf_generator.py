@@ -44,10 +44,10 @@ IMPACT_CLASS = URIRef(GFVO_ANN_EXT_NS + 'Impact')
 GFVO_FEATURE_CLASS = URIRef(GFVO_NS + 'Feature')
 INTERGENIC_REGION_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + '0000605')
 #New:
-SO_BETA_STRAND_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001111')
-SO_HELIX_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001114')
-SO_COILED_COIL_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0001080')
-SO_BINDING_SITE_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + 'SO_0000409')
+SO_BETA_STRAND_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + '0001111')
+SO_HELIX_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + '0001114')
+SO_COILED_COIL_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + '0001080')
+SO_BINDING_SITE_CLASS = URIRef(SEQUENCE_ONTOLOGY_NS + '0000409')
 EVIDENCE_FOR_FEATURE_PROP = URIRef(SEQUENCE_ONTOLOGY_NS + "evidence_for_feature")
 
 LENGTH_PROP = URIRef(UNIPROT_NS + 'length')
@@ -182,7 +182,7 @@ def add_helix_instance(feature_id, graph):
     return helix_instance
 
 def add_coiled_coil_region_instance(feature_id: str, graph: Graph) -> URIRef:
-    coiled_coil_instance = get_coiled_coil_iri(feature_id)
+    coiled_coil_instance = get_coiled_coil_region_iri(feature_id)
     graph.add((coiled_coil_instance, RDF.type, SO_COILED_COIL_CLASS))
     add_label(graph, coiled_coil_instance, feature_id)
     add_identifier(graph, coiled_coil_instance, feature_id)
