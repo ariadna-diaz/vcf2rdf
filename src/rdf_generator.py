@@ -537,7 +537,7 @@ def generate_rdf_per_vcf(vcf_files: list, output_folder: Path, output_format: st
                 print(f'Error processing {vcf_file}: {str(exc)}')
                 print(traceback.format_exc())
                 if stop_on_error:
-                    raise exc
+                    raise
             else:
                 print(f"{vcf_file} processed. Results saved to {rdf_file}")
 
@@ -556,7 +556,7 @@ def generate_rdf(vcf_files: list, output_rdf_file: Path, output_format: str, thr
                 print(traceback.format_exc())
                 # New
                 if stop_on_error:
-                    raise exc
+                    raise
             else:
                 print(f"{vcf_file} processed")
                 graph = graph + vcf_graph
