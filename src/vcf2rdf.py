@@ -10,7 +10,7 @@ def create_arg_parser():
     parser.add_argument('--output_folder', '-d', required=False, help='Output folder for the RDF files.')
     parser.add_argument('--format', '-f', required=False, default='nt', help='Output format (nt, ttl, xml, pretty-xml, n3, trig, trix, json-ld)')
     parser.add_argument('--threads', '-t', required=False, default=1, type=int, help='Number of threads.')
-    parser.add_argument('--stop-on-error', action='store_true', help='Edit.')
+    parser.add_argument('--stop-on-error', action='store_true', help='Stop pipeline if an error occurs.')
     return parser.parse_args()
 
 if __name__ == '__main__':
